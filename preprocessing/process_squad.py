@@ -13,6 +13,10 @@ def data_from_json(json_path):
     return data
 
 
+def write_to_file(out_file, line):
+    out_file.write(line + '\n')
+
+
 def tokenize(sequence):
     tokens = [token.replace("``", '"').replace("''", '"').lower()
               for token in nltk.word_tokenize(sequence)]
@@ -56,7 +60,7 @@ def preprocess_and_write(json_path, tier):
         for pid in range(len(article_paragraphs)):
 
             # context processing
-            context = str(article_paragraphs[pid])
+            context = str(article_paragraphs[pid]['context'])
             # BidAF suggestions
             context = context.replace("''", '" ')
             context = context.replace("``", '" ')
@@ -112,13 +116,13 @@ def preprocess_and_write(json_path, tier):
     print("Processed %i examples of total %i\n" % (
         num_exs, num_exs + num_mappingprob + num_tokenprob + num_spanalingnprob + num_noanswer))
 
-    indices = range(len(examples))
+    indices = list(range(len(examples)))
     np.random.shuffle(indices)
 
-    with open(os.path.join(c.data_dir, tier + '.context'), 'w') as context_file,  \
-            open(os.path.join(c.data_dir, tier + '.question'), 'w') as question_file,\
-            open(os.path.join(c.data_dir, tier + '.answer'), 'w') as ans_text_file, \
-            open(os.path.join(c.data_dir, tier + '.span'), 'w') as span_file:
+    with open(os.path.join(c.data_dir, tier + '.context'), 'w', encoding='utf-8') as context_file,  \
+            open(os.path.join(c.data_dir, tier + '.question'), 'w', encoding='utf-8') as question_file,\
+            open(os.path.join(c.data_dir, tier + '.answer'), 'w', encoding='utf8') as ans_text_file, \
+            open(os.path.join(c.data_dir, tier + '.span'), 'w', encoding='utf8') as span_file:
 
         for i in indices:
             (context, question, answer, answer_span) = examples[i]
@@ -135,6 +139,5 @@ if __name__ == "__main__":
 
     if not os.path.exists(train_path):
         get_data.main()
-
     preprocess_and_write(train_path, 'train')
     preprocess_and_write(dev_path, 'dev')

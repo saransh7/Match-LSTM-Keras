@@ -1,5 +1,5 @@
 """
-Downloads Squad data
+Downloads Squad data and Glove embedding
 """
 import os
 import sys
